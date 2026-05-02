@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RentCarDürres - Car Rental in Durrës</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f1218;
+      color: #f5f7fb;
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1180px, 92%); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,18,24,.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; }
+    .logo { font-size: 24px; font-weight: 800; letter-spacing: .2px; }
+    .logo span { color: #d7b46a; }
+    .lang { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .lang button {
+      border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #fff;
+      padding: 8px 10px; border-radius: 999px; cursor: pointer; font-weight: 700;
+    }
+    .lang button.active, .lang button:hover { background: #d7b46a; color: #111; }
+    .hero {
+      min-height: 640px; display: grid; align-items: center; position: relative; overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(215,180,106,.20), transparent 30%),
+        radial-gradient(circle at 80% 40%, rgba(67,116,255,.18), transparent 30%),
+        linear-gradient(135deg, #111722, #0f1218 55%, #17110b);
+    }
+    .hero:after { content:""; position:absolute; inset:auto -10% -35% -10%; height: 55%; background: linear-gradient(180deg, transparent, rgba(215,180,106,.08)); transform: skewY(-4deg); }
+    .hero-content { position: relative; z-index: 2; max-width: 780px; padding: 70px 0; }
+    .badge { display:inline-flex; gap:8px; align-items:center; background:rgba(215,180,106,.12); border:1px solid rgba(215,180,106,.35); color:#f2d89b; padding:8px 12px; border-radius:999px; font-weight:700; margin-bottom:20px; }
+    h1 { font-size: clamp(38px, 6vw, 76px); line-height: .98; margin-bottom: 22px; letter-spacing: -2px; }
+    .hero p { font-size: clamp(17px, 2vw, 22px); color: #cbd2df; max-width: 690px; margin-bottom: 30px; }
+    .cta-row { display:flex; gap:14px; flex-wrap:wrap; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      min-height:48px; padding: 13px 20px; border-radius: 14px; border:0; cursor:pointer;
+      font-weight:800; font-size:15px; transition:.2s; text-align:center;
+    }
+    .btn-primary { background:#25D366; color:#07150c; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 14px 30px rgba(37,211,102,.25); }
+    .btn-secondary { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); color:#fff; }
+    section { padding: 72px 0; }
+    .section-title { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:28px; }
+    .section-title h2 { font-size: clamp(30px, 4vw, 48px); letter-spacing:-1px; }
+    .section-title p { color:#aeb7c6; max-width:520px; }
+    .cars { display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.11); border-radius: 24px; overflow:hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.20);
+    }
+    .slider { position:relative; height:220px; background:#202632; overflow:hidden; }
+    .slide { display:none; height:100%; align-items:center; justify-content:center; background:linear-gradient(135deg,#343a46,#676d78); color:#d7dce5; font-weight:800; font-size:18px; text-align:center; padding:20px; }
+    .slide.active { display:flex; }
+    .slide:nth-child(2) { background:linear-gradient(135deg,#2b303a,#535b68); }
+    .slide:nth-child(3) { background:linear-gradient(135deg,#3a3e46,#707680); }
+    .slider-btn { position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border:0; border-radius:50%; background:rgba(0,0,0,.45); color:#fff; cursor:pointer; font-size:20px; }
+    .prev { left:10px; } .next { right:10px; }
+    .dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); }
+    .dot.active { background:#d7b46a; }
+    .card-body { padding: 22px; }
+    .car-top { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:10px; }
+    .car-top h3 { font-size:23px; line-height:1.15; }
+    .price { background:rgba(215,180,106,.13); color:#f5d58e; border:1px solid rgba(215,180,106,.35); border-radius:14px; padding:8px 10px; white-space:nowrap; font-weight:900; }
+    .desc { color:#bcc5d3; margin: 12px 0 18px; min-height:74px; }
+    .features { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+    .chip { font-size:12px; color:#d9dfeb; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.08); padding:6px 9px; border-radius:999px; }
+    .why { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .why-box { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:22px; }
+    .why-box h3 { color:#f1cf84; margin-bottom:8px; }
+    .why-box p { color:#b8c0ce; }
+    .booking { background:linear-gradient(135deg, rgba(215,180,106,.12), rgba(255,255,255,.04)); border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
+    form { display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; background:rgba(15,18,24,.75); border:1px solid rgba(255,255,255,.12); border-radius:24px; padding:24px; }
+    .full { grid-column: 1 / -1; }
+    label { display:block; font-size:13px; color:#c4ccd9; margin-bottom:6px; font-weight:700; }
+    input, select, textarea {
+      width:100%; background:#111722; color:#fff; border:1px solid rgba(255,255,255,.16); border-radius:14px; padding:13px 14px; outline:none; font-size:15px;
+    }
+    textarea { min-height:100px; resize:vertical; }
+    input:focus, select:focus, textarea:focus { border-color:#d7b46a; }
+    footer { padding:34px 0; color:#aeb7c6; text-align:center; }
+    .floating-wa { position:fixed; right:18px; bottom:18px; z-index:80; border-radius:999px; box-shadow:0 14px 40px rgba(37,211,102,.28); }
+    @media (max-width: 900px) { .cars { grid-template-columns:1fr 1fr; } .why { grid-template-columns:1fr; } }
+    @media (max-width: 640px) { .nav { align-items:flex-start; flex-direction:column; } .cars { grid-template-columns:1fr; } form { grid-template-columns:1fr; } .hero { min-height:auto; } .slider { height:200px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">RentCar<span>Dürres</span></div>
+      <div class="lang">
+        <button class="active" onclick="setLang('en')">EN</button>
+        <button onclick="setLang('sq')">AL</button>
+        <button onclick="setLang('it')">IT</button>
+        <button onclick="setLang('uk')">UA</button>
+        <button onclick="setLang('de')">DE</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <div class="badge" data-i18n="badge">Car rental in Durrës from €35/day</div>
+        <h1 data-i18n="heroTitle">Reliable cars for your trip around Albania</h1>
+        <p data-i18n="heroText">Choose a comfortable car in Durrës, book fast through WhatsApp and enjoy simple rental terms with clear daily pricing.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" id="heroWa" target="_blank" data-i18n="waBtn">Book via WhatsApp</a>
+          <a href="#cars" class="btn btn-secondary" data-i18n="seeCars">See available cars</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="cars">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2 data-i18n="carsTitle">Available cars</h2>
+            <p data-i18n="carsText">All cars are available for the same clear price - €35 per day. Photos are placeholders and can be replaced with real vehicle photos later.</p>
+          </div>
+        </div>
+        <div class="cars" id="carsGrid"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container why">
+        <div class="why-box"><h3 data-i18n="why1t">Fast booking</h3><p data-i18n="why1p">Send a request in one click and get a quick answer in WhatsApp.</p></div>
+        <div class="why-box"><h3 data-i18n="why2t">Clear price</h3><p data-i18n="why2p">Every listed car has a fixed daily rental price of €35.</p></div>
+        <div class="why-box"><h3 data-i18n="why3t">Durrës location</h3><p data-i18n="why3p">Convenient rental service for Durrës, Tirana and trips around Albania.</p></div>
+      </div>
+    </section>
+
+    <section class="booking" id="booking">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2 data-i18n="formTitle">Send a booking request</h2>
+            <p data-i18n="formText">Fill in the details and send the request directly to WhatsApp.</p>
+          </div>
+        </div>
+        <form id="bookingForm">
+          <div>
+            <label data-i18n="nameLabel">Your name</label>
+            <input id="name" type="text" required placeholder="Name" />
+          </div>
+          <div>
+            <label data-i18n="phoneLabel">WhatsApp number</label>
+            <input id="phone" type="text" required placeholder="+355..." />
+          </div>
+          <div>
+            <label data-i18n="carLabel">Choose car</label>
+            <select id="carSelect" required></select>
+          </div>
+          <div>
+            <label data-i18n="dateLabel">Booking date</label>
+            <input id="date" type="date" required />
+          </div>
+          <div>
+            <label data-i18n="daysLabel">How many days?</label>
+            <input id="days" type="number" min="1" value="1" required />
+          </div>
+          <div>
+            <label data-i18n="pickupLabel">Pickup place</label>
+            <input id="pickup" type="text" placeholder="Durrës" />
+          </div>
+          <div class="full">
+            <label data-i18n="commentLabel">Comment</label>
+            <textarea id="comment" placeholder="Message"></textarea>
+          </div>
+          <div class="full cta-row">
+            <button type="submit" class="btn btn-primary" data-i18n="sendForm">Send request to WhatsApp</button>
+            <a class="btn btn-secondary" id="bottomWa" target="_blank" data-i18n="contactWa">Contact on WhatsApp</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <a class="btn btn-primary floating-wa" id="floatWa" target="_blank">WhatsApp</a>
+
+  <footer>
+    <div class="container">© <span id="year"></span> RentCarDürres. <span data-i18n="footer">Car rental in Durrës, Albania.</span></div>
+  </footer>
+
+<script>
+const phone = '355693750435';
+const cars = [
+  { key:'accent', name:'Hyundai Accent' },
+  { key:'golf', name:'Volkswagen Golf' },
+  { key:'cruze', name:'Chevrolet Cruze' },
+  { key:'yaris', name:'Toyota Yaris' },
+  { key:'fiesta', name:'Ford Fiesta' }
+];
+const dict = {
+  en: {
+    badge:'Car rental in Durrës from €35/day', heroTitle:'Reliable cars for your trip around Albania', heroText:'Choose a comfortable car in Durrës, book fast through WhatsApp and enjoy simple rental terms with clear daily pricing.', waBtn:'Book via WhatsApp', seeCars:'See available cars', carsTitle:'Available cars', carsText:'All cars are available for the same clear price - €35 per day. Photos are placeholders and can be replaced with real vehicle photos later.', price:'€35/day', book:'Book this car', placeholder:'Photo placeholder', features:['Automatic/manual options','Comfortable city car','Easy booking'],
+    desc:{accent:'A practical and economical car for city driving, daily errands and short trips around Durrës.', golf:'A comfortable hatchback with a solid feel, good space and easy handling for city and highway trips.', cruze:'A spacious and confident car for comfortable travel around Durrës, Tirana and nearby destinations.', yaris:'Compact, reliable and easy to park - a smart choice for city routes and coastal drives.', fiesta:'Small, agile and fuel-friendly, perfect for quick movement around Durrës and nearby areas.'},
+    why1t:'Fast booking', why1p:'Send a request in one click and get a quick answer in WhatsApp.', why2t:'Clear price', why2p:'Every listed car has a fixed daily rental price of €35.', why3t:'Durrës location', why3p:'Convenient rental service for Durrës, Tirana and trips around Albania.', formTitle:'Send a booking request', formText:'Fill in the details and send the request directly to WhatsApp.', nameLabel:'Your name', phoneLabel:'WhatsApp number', carLabel:'Choose car', dateLabel:'Booking date', daysLabel:'How many days?', pickupLabel:'Pickup place', commentLabel:'Comment', sendForm:'Send request to WhatsApp', contactWa:'Contact on WhatsApp', footer:'Car rental in Durrës, Albania.', msgBook:'Hello, I want to book', msgGeneral:'Hello, I want to rent a car in Durrës.', formMsg:'Hello, I want to book a car.'
+  },
+  sq: {
+    badge:'Makina me qira në Durrës nga €35/ditë', heroTitle:'Makina të besueshme për udhëtimin tuaj në Shqipëri', heroText:'Zgjidhni një makinë komode në Durrës, rezervoni shpejt në WhatsApp dhe shijoni kushte të thjeshta me çmim të qartë ditor.', waBtn:'Rezervo në WhatsApp', seeCars:'Shiko makinat', carsTitle:'Makinat në dispozicion', carsText:'Të gjitha makinat kanë të njëjtin çmim - €35 në ditë. Fotot janë provizore dhe mund të zëvendësohen më vonë.', price:'€35/ditë', book:'Rezervo këtë makinë', placeholder:'Vend për foto', features:['Opsione automat/manual','Makina komode për qytet','Rezervim i lehtë'],
+    desc:{accent:'Makinë praktike dhe ekonomike për qytet, punë ditore dhe udhëtime të shkurtra rreth Durrësit.', golf:'Hatchback komod me hapësirë të mirë dhe drejtim të lehtë për qytet dhe autostradë.', cruze:'Makinë e gjerë dhe komode për udhëtime në Durrës, Tiranë dhe destinacione pranë.', yaris:'Kompakte, e besueshme dhe e lehtë për parkim - zgjedhje e mirë për qytet dhe bregdet.', fiesta:'E vogël, e shpejtë dhe ekonomike, perfekte për lëvizje në Durrës dhe zonat pranë.'},
+    why1t:'Rezervim i shpejtë', why1p:'Dërgoni kërkesën me një klik dhe merrni përgjigje në WhatsApp.', why2t:'Çmim i qartë', why2p:'Çdo makinë ka çmim fiks €35 në ditë.', why3t:'Vendndodhje në Durrës', why3p:'Shërbim i përshtatshëm për Durrës, Tiranë dhe udhëtime në Shqipëri.', formTitle:'Dërgo kërkesë rezervimi', formText:'Plotësoni të dhënat dhe dërgojeni kërkesën në WhatsApp.', nameLabel:'Emri juaj', phoneLabel:'Numri WhatsApp', carLabel:'Zgjidh makinën', dateLabel:'Data e rezervimit', daysLabel:'Sa ditë?', pickupLabel:'Vendi i marrjes', commentLabel:'Koment', sendForm:'Dërgo në WhatsApp', contactWa:'Kontakto në WhatsApp', footer:'Makina me qira në Durrës, Shqipëri.', msgBook:'Përshëndetje, dua të rezervoj', msgGeneral:'Përshëndetje, dua të marr një makinë me qira në Durrës.', formMsg:'Përshëndetje, dua të rezervoj një makinë.'
+  },
+  it: {
+    badge:'Noleggio auto a Durazzo da €35/giorno', heroTitle:'Auto affidabili per il tuo viaggio in Albania', heroText:'Scegli un’auto comoda a Durazzo, prenota velocemente su WhatsApp e goditi condizioni semplici con prezzo chiaro.', waBtn:'Prenota su WhatsApp', seeCars:'Vedi le auto', carsTitle:'Auto disponibili', carsText:'Tutte le auto sono disponibili allo stesso prezzo - €35 al giorno. Le foto sono segnaposto e possono essere sostituite più avanti.', price:'€35/giorno', book:'Prenota questa auto', placeholder:'Segnaposto foto', features:['Opzioni automatico/manuale','Comoda per la città','Prenotazione facile'],
+    desc:{accent:'Auto pratica ed economica per la città, commissioni quotidiane e brevi viaggi intorno a Durazzo.', golf:'Hatchback comoda con buon spazio e guida facile per città e autostrada.', cruze:'Auto spaziosa e confortevole per viaggi a Durazzo, Tirana e destinazioni vicine.', yaris:'Compatta, affidabile e facile da parcheggiare - ottima per città e costa.', fiesta:'Piccola, agile ed economica, perfetta per muoversi a Durazzo e dintorni.'},
+    why1t:'Prenotazione veloce', why1p:'Invia una richiesta con un clic e ricevi risposta su WhatsApp.', why2t:'Prezzo chiaro', why2p:'Ogni auto ha prezzo fisso di €35 al giorno.', why3t:'Posizione Durazzo', why3p:'Servizio comodo per Durazzo, Tirana e viaggi in Albania.', formTitle:'Invia richiesta di prenotazione', formText:'Compila i dati e invia la richiesta direttamente su WhatsApp.', nameLabel:'Il tuo nome', phoneLabel:'Numero WhatsApp', carLabel:'Scegli auto', dateLabel:'Data prenotazione', daysLabel:'Quanti giorni?', pickupLabel:'Luogo di ritiro', commentLabel:'Commento', sendForm:'Invia richiesta su WhatsApp', contactWa:'Contatta su WhatsApp', footer:'Noleggio auto a Durazzo, Albania.', msgBook:'Ciao, voglio prenotare', msgGeneral:'Ciao, voglio noleggiare un’auto a Durazzo.', formMsg:'Ciao, voglio prenotare un’auto.'
+  },
+  uk: {
+    badge:'Оренда авто в Дурресі від 35€/доба', heroTitle:'Надійні авто для поїздок Албанією', heroText:'Оберіть комфортне авто в Дурресі, швидко забронюйте через WhatsApp і користуйтеся простими умовами з прозорою ціною.', waBtn:'Забронювати в WhatsApp', seeCars:'Переглянути авто', carsTitle:'Авто в наявності', carsText:'Усі авто доступні за однією прозорою ціною - 35€ за добу. Фото є тимчасовими плейсхолдерами, їх можна замінити пізніше.', price:'35€/доба', book:'Забронювати це авто', placeholder:'Місце для фото', features:['Автомат/механіка','Комфортне міське авто','Швидке бронювання'],
+    desc:{accent:'Практичне та економне авто для міста, щоденних поїздок і коротких маршрутів навколо Дурреса.', golf:'Комфортний хетчбек із хорошим простором і легким керуванням для міста та траси.', cruze:'Просторе та впевнене авто для комфортних поїздок Дурресом, до Тирани та поруч.', yaris:'Компактне, надійне та зручне для паркування - розумний вибір для міста й узбережжя.', fiesta:'Невелике, маневрене та економне авто для швидкого пересування Дурресом і поруч.'},
+    why1t:'Швидке бронювання', why1p:'Надішліть заявку в один клік і отримайте відповідь у WhatsApp.', why2t:'Прозора ціна', why2p:'Кожне авто має фіксовану ціну 35€ за добу.', why3t:'Локація Дуррес', why3p:'Зручний сервіс для Дурреса, Тирани та поїздок Албанією.', formTitle:'Надіслати заявку на бронювання', formText:'Заповніть дані й відправте заявку одразу в WhatsApp.', nameLabel:'Ваше ім’я', phoneLabel:'Номер WhatsApp', carLabel:'Оберіть авто', dateLabel:'Дата бронювання', daysLabel:'На скільки днів?', pickupLabel:'Місце отримання', commentLabel:'Коментар', sendForm:'Надіслати в WhatsApp', contactWa:'Зв’язатися в WhatsApp', footer:'Оренда авто в Дурресі, Албанія.', msgBook:'Вітаю, хочу забронювати', msgGeneral:'Вітаю, хочу орендувати авто в Дурресі.', formMsg:'Вітаю, хочу забронювати авто.'
+  },
+  de: {
+    badge:'Autovermietung in Durrës ab 35€/Tag', heroTitle:'Zuverlässige Autos für Ihre Reise durch Albanien', heroText:'Wählen Sie ein komfortables Auto in Durrës, buchen Sie schnell über WhatsApp und genießen Sie einfache Bedingungen mit klarem Tagespreis.', waBtn:'Über WhatsApp buchen', seeCars:'Autos ansehen', carsTitle:'Verfügbare Autos', carsText:'Alle Autos sind zum gleichen Preis verfügbar - 35€ pro Tag. Die Fotos sind Platzhalter und können später ersetzt werden.', price:'35€/Tag', book:'Dieses Auto buchen', placeholder:'Foto-Platzhalter', features:['Automatik/Schalter Optionen','Komfortables Stadtauto','Einfache Buchung'],
+    desc:{accent:'Praktisches und sparsames Auto für Stadtfahrten, tägliche Wege und kurze Trips rund um Durrës.', golf:'Komfortabler Hatchback mit gutem Platzangebot und einfacher Bedienung für Stadt und Autobahn.', cruze:'Geräumiges und komfortables Auto für Fahrten in Durrës, Tirana und nahe Ziele.', yaris:'Kompakt, zuverlässig und leicht zu parken - eine gute Wahl für Stadt und Küste.', fiesta:'Klein, wendig und sparsam, perfekt für Fahrten in Durrës und Umgebung.'},
+    why1t:'Schnelle Buchung', why1p:'Senden Sie eine Anfrage mit einem Klick und erhalten Sie Antwort in WhatsApp.', why2t:'Klarer Preis', why2p:'Jedes Auto hat einen festen Tagespreis von 35€.', why3t:'Standort Durrës', why3p:'Praktischer Service für Durrës, Tirana und Reisen in Albanien.', formTitle:'Buchungsanfrage senden', formText:'Füllen Sie die Angaben aus und senden Sie die Anfrage direkt an WhatsApp.', nameLabel:'Ihr Name', phoneLabel:'WhatsApp-Nummer', carLabel:'Auto wählen', dateLabel:'Buchungsdatum', daysLabel:'Wie viele Tage?', pickupLabel:'Abholort', commentLabel:'Kommentar', sendForm:'Anfrage an WhatsApp senden', contactWa:'Kontakt über WhatsApp', footer:'Autovermietung in Durrës, Albanien.', msgBook:'Hallo, ich möchte buchen', msgGeneral:'Hallo, ich möchte ein Auto in Durrës mieten.', formMsg:'Hallo, ich möchte ein Auto buchen.'
+  }
+};
+let currentLang = 'en';
+function waLink(text){ return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`; }
+function renderCars(){
+  const t = dict[currentLang];
+  const grid = document.getElementById('carsGrid');
+  grid.innerHTML = cars.map((car, idx) => `
+    <article class="card">
+      <div class="slider" data-slider="${idx}">
+        <div class="slide active">${t.placeholder}<br>${car.name}</div>
+        <div class="slide">${t.placeholder}<br>${car.name}</div>
+        <div class="slide">${t.placeholder}<br>${car.name}</div>
+        <button class="slider-btn prev" type="button" onclick="moveSlide(${idx},-1)">‹</button>
+        <button class="slider-btn next" type="button" onclick="moveSlide(${idx},1)">›</button>
+        <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+      <div class="card-body">
+        <div class="car-top"><h3>${car.name}</h3><div class="price">${t.price}</div></div>
+        <p class="desc">${t.desc[car.key]}</p>
+        <div class="features">${t.features.map(f=>`<span class="chip">${f}</span>`).join('')}</div>
+        <a class="btn btn-primary" target="_blank" href="${waLink(t.msgBook + ' ' + car.name + ' - 35€/day')}">${t.book}</a>
+      </div>
+    </article>`).join('');
+  const select = document.getElementById('carSelect');
+  select.innerHTML = cars.map(c=>`<option value="${c.name}">${c.name} - 35€</option>`).join('');
+}
+function moveSlide(sliderIndex, dir){
+  const slider = document.querySelector(`[data-slider="${sliderIndex}"]`);
+  const slides = slider.querySelectorAll('.slide');
+  const dots = slider.querySelectorAll('.dot');
+  let current = Array.from(slides).findIndex(s=>s.classList.contains('active'));
+  slides[current].classList.remove('active'); dots[current].classList.remove('active');
+  current = (current + dir + slides.length) % slides.length;
+  slides[current].classList.add('active'); dots[current].classList.add('active');
+}
+function setLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.remove('active'));
+  const map = {en:0,sq:1,it:2,uk:3,de:4};
+  document.querySelectorAll('.lang button')[map[lang]].classList.add('active');
+  const t = dict[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const key = el.getAttribute('data-i18n'); if(t[key]) el.textContent = t[key]; });
+  document.getElementById('heroWa').href = waLink(t.msgGeneral);
+  document.getElementById('bottomWa').href = waLink(t.msgGeneral);
+  document.getElementById('floatWa').href = waLink(t.msgGeneral);
+  renderCars();
+}
+document.getElementById('bookingForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const t = dict[currentLang];
+  const name = document.getElementById('name').value.trim();
+  const userPhone = document.getElementById('phone').value.trim();
+  const car = document.getElementById('carSelect').value;
+  const date = document.getElementById('date').value;
+  const days = document.getElementById('days').value;
+  const pickup = document.getElementById('pickup').value.trim();
+  const comment = document.getElementById('comment').value.trim();
+  const msg = `${t.formMsg}\n\nName: ${name}\nWhatsApp: ${userPhone}\nCar: ${car}\nDate: ${date}\nDays: ${days}\nPickup: ${pickup || '-'}\nPrice: 35€/day\nComment: ${comment || '-'}`;
+  window.open(waLink(msg), '_blank');
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+setLang('en');
+</script>
+</body>
+</html>
